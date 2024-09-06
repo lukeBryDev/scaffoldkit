@@ -12,7 +12,7 @@ class ExampleRepositoryImpl implements ExampleRepository {
   ExampleRepositoryImpl({required this.remoteDataSource});
 
   @override
-  Future<Either<Failure, ExampleEntity>> getComics(ExampleDTO params) async {
+  Future<Either<Failure, ExampleEntity>> example(ExampleDTO params) async {
     try {
       final res = await remoteDataSource.example(params);
       return Right(res);

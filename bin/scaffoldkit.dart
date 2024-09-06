@@ -1,86 +1,102 @@
 library scaffoldkit;
 
 import 'dart:io';
+import 'dart:isolate';
 
 import 'settings.dart';
 
-void main(List<String> arguments) {
+Future<void> main(List<String> arguments) async {
   print('👀 STARTING . . .');
+
   if (arguments.isEmpty) {
     print('Por favor, proporciona el nombre del proyecto.');
     return;
   }
 
-  final projectName = arguments[0];
-  final baseDir = Directory.current;
-
-  /// Generate the folder structure
-  _createFolderStructure(baseDir);
+  final String projectName = arguments[0];
 
   /// Copy files and replace {PROJECT_NAME}
-  _copyAndReplaceFiles(projectName);
+  await _fileScaffolding(projectName);
 
   /// Install dependencies from pub.dev
-  // _installRequiredPackages();
+  await _installRequiredPackages();
   print('🔥 READY TO ROCK!');
 }
 
-void _createFolderStructure(Directory baseDir) {
-  print('🗂️ FOLDER CREATION PROCESS: init');
-  for (final dir in directories) {
-    final newDir = Directory('${baseDir.path}/$dir');
-    if (!newDir.existsSync()) {
-      newDir.createSync(recursive: true);
-      print('Folder $newDir created');
-    }
+// Función para copiar archivos y reemplazar {PROJECT_NAME}
+Future<void> _fileScaffolding(String projectName) async {
+  print('📄 FILES CREATING PROCESS: init');
+
+  // Resuelve la URI del archivo que quieres acceder desde el package
+  final uri = await Isolate.resolvePackageUri(
+      Uri.parse('package:scaffoldkit/')); // Reemplaza por tu package
+
+  if (uri == null) {
+    print('Source file not found');
+    return;
   }
-  print('🗂️ FOLDER CREATION PROCESS: finish');
+
+  final sourceDir = Directory(uri.path);
+  if (!sourceDir.existsSync()) {
+    print('Source directory not found');
+    return;
+  }
+
+  _copyAndReplacePackageName(uri.toFilePath(), projectName);
+  // _copyAndReplacePackageNameV1(sourceDir, projectName);
+
+  print('📄 FILES CREATING PROCESS: completed');
 }
 
-// Función para copiar archivos y reemplazar {PROJECT_NAME}
-void _copyAndReplaceFiles(String projectName) {
-  print('📄 FILES CREATING PROCESS: init');
-  files.forEach((sourcePath, targetPath) {
-    final file = File(sourcePath);
+Future<void> _copyAndReplacePackageName(
+    String sourcePath, String projectName) async {
+  for (final path in files) {
+    final file = File('$sourcePath/$path');
 
-    // Verifica si el archivo fuente existe
+// Verifica si el archivo fuente existe
     if (file.existsSync()) {
-      // Leer el contenido del archivo fuente
+// Leer el contenido del archivo fuente
       String content = file.readAsStringSync();
 
-      // Reemplaza {PROJECT_NAME} con el nombre del proyecto
+// Reemplaza {PROJECT_NAME} con el nombre del proyecto
       content = content.replaceAll('{PROJECT_NAME}', projectName);
 
-      // Asegúrate de que el directorio del archivo de destino exista
-      final targetFile = File(targetPath);
+// Asegúrate de que el directorio del archivo de destino exista
+      final targetFile = File('lib/$path');
       if (!targetFile.parent.existsSync()) {
         targetFile.parent
             .createSync(recursive: true); // Crear los directorios de destino
       }
 
-      // Escribir el archivo en la ruta de destino
+// Escribir el archivo en la ruta de destino
       targetFile.writeAsStringSync(content);
-      print('File $sourcePath copied to: $targetPath');
+      print('File ${file.path} copied to: lib/$path');
     } else {
-      print('The origin file doesn\'t exist in: ${file.path}');
+      print('The origin file doesn\'t exist in: $path');
     }
-  });
-  print('📄 FILES CREATING PROCESS: finish');
+  }
 }
 
 // Función para instalar los paquetes requeridos
-void _installRequiredPackages() async {
+Future<void> _installRequiredPackages() async {
   print('📚 PACKAGES INSTALLING PROCESS: init');
   for (final package in requiredPackages) {
-    print('Instalando paquete: $package...');
-
-    // Ejecuta el comando "flutter pub add {package}"
-    final result = await Process.run('flutter', ['pub', 'add', package]);
-
-    if (result.exitCode == 0) {
-      print('Paquete $package instalado correctamente.');
+    if (package == 'flutter_localizations') {
+      print(
+          'For install $package dependency, copy and paste these lines below in pubspec.yaml:\n '
+          'flutter_localizations:\n'
+          '  sdk: flutter');
     } else {
-      print('Error al instalar $package: ${result.stderr}');
+      print('Instalando paquete: $package...');
+
+      // Ejecuta el comando "flutter pub add {package}"
+      final result = await Process.run('flutter', ['pub', 'add', package]);
+
+      if (result.exitCode == 0) {
+        print('Paquete $package instalado correctamente.');
+      } else {
+        print('Error al instalar $package: ${result.stderr}');
+      }
     }
   }
   await Process.run('flutter', ['pub', 'get']);

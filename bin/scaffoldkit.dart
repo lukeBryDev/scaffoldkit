@@ -6,34 +6,43 @@ import 'package:path/path.dart' as p;
 
 import 'settings.dart';
 
+/// Entry point for the scaffolding process.
+/// It takes the project name as an argument, performs file scaffolding,
+/// and installs the required dependencies.
 Future<void> main(List<String> arguments) async {
   print('👀 STARTING . . .');
 
+  // Check if the project name was provided as an argument
   if (arguments.isEmpty) {
-    print('Por favor, proporciona el nombre del proyecto.');
+    print('Please provide the project name.');
     return;
   }
 
   final String projectName = arguments[0];
 
-  /// Copy files and replace {PROJECT_NAME}
-  await _fileScaffolding(projectName);
+  await Future.wait([
+    /// Step 1: Copy template files and replace the placeholder {PROJECT_NAME}
+    _fileScaffolding(projectName),
 
-  /// Install dependencies from pub.dev
-  await _installRequiredPackages();
+    /// Step 2: Install required dependencies from pub.dev
+    _installRequiredPackages()
+  ]);
+
   print('🔥 READY TO ROCK!');
 }
 
-// Función para copiar archivos y reemplazar {PROJECT_NAME}
+/// Function to handle the file scaffolding process.
+/// It will copy files from the package and replace the placeholder {PROJECT_NAME}
+/// with the actual project name.
 Future<void> _fileScaffolding(String projectName) async {
-  print('📄 FILES CREATING PROCESS: init');
+  print('🗂️ SCAFFOLDING PROCESS: init');
 
-  // Resuelve la URI del archivo que quieres acceder desde el package
-  final uri = await Isolate.resolvePackageUri(
-      Uri.parse('package:scaffoldkit/')); // Reemplaza por tu package
+  // Resolve the package URI to locate the template files within the package
+  final uri = await Isolate.resolvePackageUri(Uri.parse(
+      'package:scaffoldkit/')); // Replace with your actual package name
 
   if (uri == null) {
-    print('Source file not found');
+    print('Source files not found');
     return;
   }
 
@@ -43,12 +52,17 @@ Future<void> _fileScaffolding(String projectName) async {
     return;
   }
 
+  // Copy files and replace {PROJECT_NAME} with the actual project name
   _copyAndReplacePackageName(sourceDir, projectName);
-  // _copyAndReplacePackageNameV1(sourceDir, projectName);
 
-  print('📄 FILES CREATING PROCESS: completed');
+  print('🗂️ SCAFFOLDING PROCESS: completed');
 }
 
+/// Function to copy files from the source directory and replace the placeholder
+/// {PROJECT_NAME} with the actual project name in the contents of the files.
+///
+/// [sourceDir]: The directory containing the template files.
+/// [projectName]: The actual project name to replace the {PROJECT_NAME} placeholder.
 Future<void> _copyAndReplacePackageName(
     Directory sourceDir, String projectName) async {
   for (final entity in sourceDir.listSync(recursive: true)) {
@@ -59,13 +73,13 @@ Future<void> _copyAndReplacePackageName(
       final targetFile = File(targetPath);
       targetFile.createSync(recursive: true);
 
-      // Leer el contenido del archivo original
+      // Read the contents of the source file
       String content = entity.readAsStringSync();
 
-      // Reemplazar {PROJECT_NAME} por el nombre del proyecto
+      // Replace {PROJECT_NAME} with the actual project name
       content = content.replaceAll('{PROJECT_NAME}', projectName);
 
-      // Escribir el contenido modificado en el archivo de destino
+      // Write the modified content to the target file
       targetFile.writeAsStringSync(content);
 
       print('Copied and replaced ${entity.path} to ${targetFile.path}');
@@ -73,28 +87,34 @@ Future<void> _copyAndReplacePackageName(
   }
 }
 
-// Función para instalar los paquetes requeridos
+/// Function to install the required dependencies for the project.
+/// It installs packages listed in the [requiredPackages] array via `flutter pub add`.
 Future<void> _installRequiredPackages() async {
   print('📚 PACKAGES INSTALLING PROCESS: init');
+
   for (final package in requiredPackages) {
     if (package == 'flutter_localizations') {
+      // Special case for 'flutter_localizations', which should be added manually to pubspec.yaml
       print(
-          'For install $package dependency, copy and paste these lines below in pubspec.yaml:\n '
+          'To install the $package dependency, copy and paste the following lines into pubspec.yaml:\n'
           'flutter_localizations:\n'
           '  sdk: flutter');
     } else {
-      print('Instalando paquete: $package...');
+      print('Installing package: $package...');
 
-      // Ejecuta el comando "flutter pub add {package}"
+      // Executes the "flutter pub add {package}" command
       final result = await Process.run('flutter', ['pub', 'add', package]);
 
       if (result.exitCode == 0) {
-        print('Paquete $package instalado correctamente.');
+        print('Package $package installed successfully.');
       } else {
-        print('Error al instalar $package: ${result.stderr}');
+        print('Error installing $package: ${result.stderr}');
       }
     }
   }
+
+  // Run `flutter pub get` to fetch all dependencies
   await Process.run('flutter', ['pub', 'get']);
-  print('📚 PACKAGES INSTALLING PROCESS: finish');
+
+  print('📚 PACKAGES INSTALLING PROCESS: completed');
 }

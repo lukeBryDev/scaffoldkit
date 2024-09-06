@@ -142,3 +142,7 @@ dart run scaffoldkit <project_name>
 
 Contributions are welcome! If you find any issues or have suggestions, feel free to open an issue or
 send a pull request.
+
+## License
+
+This project is licensed under the [MIT License](LICENSE).

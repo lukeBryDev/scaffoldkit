@@ -1,5 +1,5 @@
 name: scaffoldkit
-description: "A new Flutter package project."
+description: "Clean architecture scaffolding Flutter package project."
 version: 0.0.1
 homepage:
 
@@ -15,6 +15,9 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^4.0.0
+
+executables:
+  scaffoldkit: bin/scaffoldkit.dart
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

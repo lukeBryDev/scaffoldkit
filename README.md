@@ -1,8 +1,8 @@
 # ScaffoldKit
 
-**ScaffoldKit** is a Flutter package that automates the creation of a base folder structure and
-updates import statements according to the project's name. It also automatically installs a list of
-essential packages from **pub.dev** to streamline the setup of your projects.
+**ScaffoldKit** is a Flutter package that automates the creation of a base folder structure based on
+clean architecture and updates import statements according to the project's name. It also automatically
+installs a list of essential packages from **pub.dev** to streamline the setup of your projects.
 
 ## Features
 

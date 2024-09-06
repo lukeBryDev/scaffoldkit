@@ -1,7 +1,8 @@
 # ScaffoldKit
 
 **ScaffoldKit** is a Flutter package that automates the creation of a base folder structure based on
-clean architecture and updates import statements according to the project's name. It also automatically
+clean architecture and updates import statements according to the project's name. It also
+automatically
 installs a list of essential packages from **pub.dev** to streamline the setup of your projects.
 
 ## Features
@@ -141,11 +142,3 @@ dart run scaffoldkit <project_name>
 
 Contributions are welcome! If you find any issues or have suggestions, feel free to open an issue or
 send a pull request.
-
-## License
-
-This project is licensed under the [MIT License](LICENSE).
-
-```go
-This version of the `README.md` is now in English, ready for your GitHub repository.
-```

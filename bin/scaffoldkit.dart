@@ -2,6 +2,7 @@ library scaffoldkit;
 
 import 'dart:io';
 import 'dart:isolate';
+import 'package:path/path.dart' as p;
 
 import 'settings.dart';
 
@@ -42,37 +43,32 @@ Future<void> _fileScaffolding(String projectName) async {
     return;
   }
 
-  _copyAndReplacePackageName(uri.toFilePath(), projectName);
+  _copyAndReplacePackageName(sourceDir, projectName);
   // _copyAndReplacePackageNameV1(sourceDir, projectName);
 
   print('📄 FILES CREATING PROCESS: completed');
 }
 
 Future<void> _copyAndReplacePackageName(
-    String sourcePath, String projectName) async {
-  for (final path in files) {
-    final file = File('$sourcePath/$path');
+    Directory sourceDir, String projectName) async {
+  for (final entity in sourceDir.listSync(recursive: true)) {
+    if (entity is File) {
+      final relativePath = p.relative(entity.path, from: sourceDir.path);
+      final targetPath = p.join(Directory.current.path, 'lib/$relativePath');
 
-// Verifica si el archivo fuente existe
-    if (file.existsSync()) {
-// Leer el contenido del archivo fuente
-      String content = file.readAsStringSync();
+      final targetFile = File(targetPath);
+      targetFile.createSync(recursive: true);
 
-// Reemplaza {PROJECT_NAME} con el nombre del proyecto
+      // Leer el contenido del archivo original
+      String content = entity.readAsStringSync();
+
+      // Reemplazar {PROJECT_NAME} por el nombre del proyecto
       content = content.replaceAll('{PROJECT_NAME}', projectName);
 
-// Asegúrate de que el directorio del archivo de destino exista
-      final targetFile = File('lib/$path');
-      if (!targetFile.parent.existsSync()) {
-        targetFile.parent
-            .createSync(recursive: true); // Crear los directorios de destino
-      }
-
-// Escribir el archivo en la ruta de destino
+      // Escribir el contenido modificado en el archivo de destino
       targetFile.writeAsStringSync(content);
-      print('File ${file.path} copied to: lib/$path');
-    } else {
-      print('The origin file doesn\'t exist in: $path');
+
+      print('Copied and replaced ${entity.path} to ${targetFile.path}');
     }
   }
 }

@@ -42,7 +42,7 @@ To use **ScaffoldKit** directly from GitHub, follow these steps:
    name of the project you are working on:
 
 ```bash
-flutter pub run scaffoldkit <project_name>
+dart run scaffoldkit <project_name>
 ```
 
 This command will perform the following actions:

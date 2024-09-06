@@ -50,7 +50,7 @@ This command will perform the following actions:
 
 - Create the predefined folders inside `lib/src/app/`.
 - Copy the base files to the newly created folders.
-- Replace all occurrences of `{scaffoldkit/templates}` in the import statements with the project’s
+- Replace all occurrences of `{scaffoldkit/lib}` in the import statements with the project’s
   name.
 - Automatically install the following packages from pub.dev:
     - `flutter_localizations`
@@ -104,11 +104,10 @@ The source code for **ScaffoldKit** is organized as follows:
 ```css
 scaffoldkit/
 ├── lib/
-│   └── templates/
-│       └── src/
-│           └── app/
-│               └── presentation/
-│                   └── main_screen.dart
+│     └── src/
+│         └── app/
+│             └── presentation/
+                  └── main_screen.dart
 └── bin/
     └── scaffoldkit.dart
 ```
@@ -120,7 +119,7 @@ If you want to test the package locally without publishing it, you can clone it 
 1. Clone this repository:
 
 ```bash
-git clone https://github.com/tu_usuario/scaffoldkit.git
+git clone https://github.com/lukeBryDev/scaffoldkit.git
 cd scaffoldkit 
 ```
 
